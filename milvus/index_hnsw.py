@@ -95,8 +95,8 @@ class Indexer:
         if not ok:
             param = {
                 'collection_name': collection_name,
-                'dimension': _DIM,
-                'index_file_size': _INDEX_FILE_SIZE,  # optional
+                'dimension': self.dim,
+                'index_file_size': 1024,  # optional
                 'metric_type': MetricType.L2  # optional
             }
 
