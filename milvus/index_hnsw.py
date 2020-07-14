@@ -65,6 +65,7 @@ class Indexer:
         index_to_uid = []
 
         for index, uid in enumerate(self.embedding):
+            print(index, uid)
             if index % 1000 == 0:
                 print(
                     f'[HNSW] Indexed {index}/{self.num_elements}')
@@ -102,7 +103,7 @@ class Indexer:
 
             milvus.create_collection(param)
 
-        print("--------data--------", data)
+        print("--------data--------", float(data), len(data))
         print("--------index--------", index)
         status, ids = milvus.insert(collection_name=collection_name, records=data, ids=index)
 
