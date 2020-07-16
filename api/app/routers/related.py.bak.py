@@ -27,35 +27,23 @@ async def get_related(request: Request, uid: str, page_number: int = 1, query_id
     source_vector = related_searcher.embedding[uid]
     related_results = []
 
-    # # HNSW parameters.
-    # k = 20 * page_number
-    # # https://github.com/nmslib/hnswlib/blob/master/ALGO_PARAMS.md
-    # # ef needs to be between k and dataset.size()
-    # ef = 2 * k
-    # related_searcher.hnsw.set_ef(ef)
+    # HNSW parameters.
+    k = 20 * page_number
+    # https://github.com/nmslib/hnswlib/blob/master/ALGO_PARAMS.md
+    # ef needs to be between k and dataset.size()
+    ef = 2 * k
+    related_searcher.hnsw.set_ef(ef)
 
-    # # Retrieve documents from HNSW.
-    # labels, distances = related_searcher.hnsw.knn_query(source_vector, k=k)
-
-    print("--------source_vector",source_vector)
-    parameters = {ef: 64}
-    status, results = related_searcher.milvus.search(related_searcher.collection_name, [source_vector], 100, parameters)
-    print(status, results)
-    labels = results.id_array
-    distances = results.distance_array
-    print(len(labels), len(distances))
-
+    # Retrieve documents from HNSW.
+    labels, distances = related_searcher.hnsw.knn_query(source_vector, k=k)
     start_idx = (page_number - 1)*20
     end_idx = start_idx + 20
     for index, dist in zip(labels[0][start_idx:end_idx], distances[0][start_idx:end_idx]):
         uid = related_searcher.index_to_uid[index]
-        print("-------uid-------", uid)
         hit = searcher.doc(uid, SearchVertical.cord19)
-        print("-------hit-------", hit)
         if hit.lucene_document() is None:
             continue
         result = build_related_result(hit, uid, dist)
-        print("-------result-------", result)
         related_results.append(result)
 
     # Generate UUID for query.

@@ -49,9 +49,9 @@ def load_specter_embeddings(path):
     return res, dim
 
 
-def save_index_to_uid_file(index_to_uid, index, path):
+def save_index_to_uid_file(index_to_uid, ids, path):
     remove_if_exist(path)
 
     with open(path, 'w') as f:
-        for index, uid in enumerate(index_to_uid):
-            f.write(f"{index} {uid}\n")
+        for i, uid in enumerate(index_to_uid):
+            f.write(f"{ids[i]} {uid}\n")

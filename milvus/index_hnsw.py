@@ -1,21 +1,23 @@
 import os
 
-# import hnswlib
 import numpy as np
 
 import helper
 from milvus import Milvus, IndexType, MetricType, Status
 
-_HOST = '127.0.0.1'
-_PORT = '19690'
-milvus = Milvus(_HOST, _PORT)
 
 class Indexer:
     def __init__(self, folder_path):
         self.folder_path = folder_path
+        self.host = '192.168.1.85'
+        self.port = '19570'
+        self.collection_name = 'example_collection_'
+        self.milvus = Milvus(self.host, self.port)
+
 
     def get_path(self, path) -> str:
         return os.path.join(self.folder_path, path)
+
 
     def load_data(self) -> None:
         self.metadata_path = self.get_path('metadata.csv')
@@ -30,49 +32,23 @@ class Indexer:
         print(f'Embedding dimension: {self.dim}')
         assert len(self.metadata) == len(self.embedding), "Data size mismatch"
 
-    # def initialize_hnsw_index(self) -> None:
-    #     # Declaring index
-    #     # possible options are l2, cosine or ip
-    #     milvus = Milvus(_HOST, _PORT)
-
-    #     # Create collection demo_collection if it dosen't exist.
-    #     collection_name = 'example_collection_'
-
-    #     status, ok = milvus.has_collection(collection_name)
-    #     if not ok:
-    #         param = {
-    #             'collection_name': collection_name,
-    #             'dimension': _DIM,
-    #             'index_file_size': _INDEX_FILE_SIZE,  # optional
-    #             'metric_type': MetricType.L2  # optional
-    #         }
-
-    #         milvus.create_collection(param)
-    #     # create index of vectors, search more rapidly
-    #     index_param = {M: 16, efConstruction:500}
-
-    #     # Create ivflat index in demo_collection
-    #     # You can search vectors without creating index. however, Creating index help to
-    #     # search faster
-    #     print("Creating index: {}".format(index_param))
-    #     status = milvus.create_index(collection_name, IndexType.HNSW, index_param)
-
 
     def index_and_save(self) -> None:
         print('[HNSW] Starting to index...')
         data = np.empty((0, self.dim))
         data_labels = []
         index_to_uid = []
+        ids = []
 
         for index, uid in enumerate(self.embedding):
-            print(index, uid)
             if index % 1000 == 0:
                 print(
                     f'[HNSW] Indexed {index}/{self.num_elements}')
 
             if index % 200 == 0 and len(data_labels) > 0:
                 # save progress
-                self._add_to_index(data, data_labels,  index)
+                milvus_ids = self._add_to_index(data, data_labels, index)
+                ids += milvus_ids
                 # reset
                 data = np.empty((0, self.dim))
                 data_labels = []
@@ -84,50 +60,53 @@ class Indexer:
             index_to_uid.append(uid)
 
         if len(data_labels) > 0:
-            self._add_to_index(data, data_labels, index)
-            self._save_index(data, data_labels, index_to_uid, index)
+            milvus_ids = self._add_to_index(data, data_labels, index)
+            ids += milvus_ids
+            self._save_index(data, data_labels, index_to_uid, index, ids)
 
         print('[HNSW] Finished indexing')
 
     def _add_to_index(self, data, data_labels, index):
-        collection_name = 'example_collection_'
-
-        status, ok = milvus.has_collection(collection_name)
+        status, ok = self.milvus.has_collection(self.collection_name)
+        print("----has_collection", status, ok)
         if not ok:
             param = {
-                'collection_name': collection_name,
+                'collection_name': self.collection_name,
                 'dimension': self.dim,
                 'index_file_size': 1024,  # optional
                 'metric_type': MetricType.L2  # optional
             }
 
-            milvus.create_collection(param)
+            status = self.milvus.create_collection(param)
+            print("create_collection:",status)
 
-        print("--------data--------", float(data), len(data))
-        print("--------index--------", index)
-        status, ids = milvus.insert(collection_name=collection_name, records=data, ids=index)
-
+        data = data.tolist()
+        insert_data = []
+        for d in data:
+            d_ = [float(i) for i in d]
+            insert_data.append(d_)
+        print("--------index--------", len(insert_data),self.collection_name)
+        status, ids = self.milvus.insert(collection_name=self.collection_name, records=insert_data)
+        print(status, len(ids))
+        return ids
         # create index of vectors, search more rapidly
-        index_param = {M: 16, efConstruction:500}
+        
 
-        # Create ivflat index in demo_collection
-        # You can search vectors without creating index. however, Creating index help to
-        # search faster
+    def _save_index(self, data, data_labels, index_to_uid, index, ids):
+        print("-----ids-----", len(ids))
+
+        index_param = {"M": 16, "efConstruction":500}
+
+        # Create HNSW index in demo_collection
         print("Creating index: {}".format(index_param))
-        status = milvus.create_index(collection_name, IndexType.HNSW, index_param)
-
-    def _save_index(self, data, data_labels, index_to_uid, index):
-        print('[HNSW] Saving index', index)
+        status = self.milvus.create_index(self.collection_name, IndexType.HNSW, index_param)
+        print('[HNSW] Saving index', status)
 
         file_name = 'cord19-hnsw-milvus'
-        # output_path = self.get_path(f'{file_name}.bin')
-        # helper.remove_if_exist(output_path)
-        # self.hnsw.save_index(output_path)
-
         # Save index to uid file
         helper.save_index_to_uid_file(
             index_to_uid,
-            index,
+            ids,
             self.get_path(f'{file_name}.txt'))
 
 
