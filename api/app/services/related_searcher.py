@@ -33,7 +33,6 @@ class RelatedSearcher:
                 i, uid = parsed_line
                 self.index_to_uid[int(i)] = uid
                 self.uid_set.add(uid)
-        print(self.index_to_uid)
 
         self.num_elements = len(self.index_to_uid)
         print(f'[RelatedSearcher] Loaded {self.num_elements} elements')
