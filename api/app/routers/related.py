@@ -41,7 +41,7 @@ async def get_related(request: Request, uid: str, page_number: int = 1, query_id
     print("--------source_vector",source_vector)
 
     parameters = {'ef': 64}
-    print(related_searcher.milvus.count_entities(collection_name))
+    print(related_searcher.milvus.count_entities(related_searcher.collection_name))
     status, results = related_searcher.milvus.search(related_searcher.collection_name, [source_vector], 100, parameters)
     print(status, results)
     labels = results.id_array
