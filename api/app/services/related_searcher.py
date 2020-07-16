@@ -16,7 +16,7 @@ class RelatedSearcher:
         self.index_to_uid: Dict[int, str] = {}
         self.uid_set: Set[str] = set()
 
-        self.host = '192.168.1.85'
+        self.host = '127.0.0.1'
         self.port = '19570'
         self.collection_name = 'example_collection_'
         self.milvus = Milvus(self.host, self.port)
