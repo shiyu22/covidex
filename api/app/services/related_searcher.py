@@ -16,7 +16,7 @@ class RelatedSearcher:
         self.index_to_uid: Dict[int, str] = {}
         self.uid_set: Set[str] = set()
 
-        self.host = '127.0.0.1'
+        self.host = '192.168.1.85'
         self.port = '19570'
         self.collection_name = 'example_collection_'
         self.milvus = Milvus(self.host, self.port)
@@ -27,12 +27,13 @@ class RelatedSearcher:
         # self.load_hnsw()
 
     def load_index_to_uid(self):
-        with open(settings.related_index_to_uid_path, 'r') as f:
+        with open(settings.related_milvus_index_to_uid_path, 'r') as f:
             for line in f:
                 parsed_line = line.strip().split(' ')
                 i, uid = parsed_line
                 self.index_to_uid[int(i)] = uid
                 self.uid_set.add(uid)
+        print(index_to_uid)
 
         self.num_elements = len(self.index_to_uid)
         print(f'[RelatedSearcher] Loaded {self.num_elements} elements')

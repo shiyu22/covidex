@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     # Related searcher settings
     related_bin_path: str = "index/cord19-hnsw-index/cord19-hnsw.bin"
     related_index_to_uid_path: str = "index/cord19-hnsw-index/cord19-hnsw.txt"
+    related_milvus_index_to_uid_path: str = "index/cord19-hnsw-index-milvus/cord19-hnsw-milvus.txt"
     related_specter_csv_path: str = "index/cord19-hnsw-index/specter.csv"
 
     # Anserini searcher settings

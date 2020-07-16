@@ -40,9 +40,9 @@ async def get_related(request: Request, uid: str, page_number: int = 1, query_id
     source_vector = [float(vec) for vec in source_vector]
     print("--------source_vector",source_vector)
 
-    parameters = {'ef': 64}
+    parameters = {'ef': 101}
     print(related_searcher.milvus.count_entities(related_searcher.collection_name))
-    status, results = related_searcher.milvus.search(related_searcher.collection_name, [source_vector], 100, parameters)
+    status, results = related_searcher.milvus.search(collection_name=related_searcher.collection_name, query_records=[source_vector], top_k=100, params=parameters)
     print(status, results)
     labels = results.id_array
     distances = results.distance_array
