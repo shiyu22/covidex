@@ -37,7 +37,7 @@ async def get_related(request: Request, uid: str, page_number: int = 1, query_id
     # # Retrieve documents from HNSW.
     # labels, distances = related_searcher.hnsw.knn_query(source_vector, k=k)
 
-    vids = [float(vec) for vec in source_vector]
+    source_vector = [float(vec) for vec in source_vector]
     print("--------source_vector",source_vector)
 
     parameters = {'ef': 64}
