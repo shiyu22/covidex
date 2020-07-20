@@ -12,7 +12,7 @@ class Indexer:
         self.folder_path = folder_path
         self.host = settings.host
         self.port = settings.port
-        self.collection_name = settings.collection_name'example_collection_'
+        self.collection_name = settings.collection_name
         self.milvus = Milvus(self.host, self.port)
 
 

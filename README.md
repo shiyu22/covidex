@@ -1,6 +1,6 @@
 # COVID-19 Open Research Dataset Search
 
-This repository contains the API server, neural models, and UI client, a neural search engine for the [COVID-19 Open Research Dataset (CORD-19)](https://pages.semanticscholar.org/coronavirus-research) and is refer to [covidex](https://github.com/castorini/covidex).
+This system contains the API server, neural models, and UI client, a neural search engine for the [COVID-19 Open Research Dataset (CORD-19)](https://pages.semanticscholar.org/coronavirus-research) and is refer to [covidex](https://github.com/castorini/covidex).
 
 
 ## Local Deployment
@@ -39,18 +39,20 @@ $ docker run -d --name milvus_cpu_0.10.0 \
 milvusdb/milvus:0.10.0-cpu-d061620-5f3c00
 ```
 
+> Point out the Milvus host and port in the **api/app/settings.py** file, you can modify them for your own environment.
+
 #### 2. Prepare Anaconda environment
 
 ```bash
-# Create an Anaconda environment for Python 3.7
+# Create an Anaconda environment named covdiex for Python 3.7
 $ conda create -n covidex python=3.7
-# Activate the Anaconda environment
+# Activate the covdiex environment
 $ conda activate covidex
 # Install Python dependencies
 $ pip install -r api/requirements.txt
 ```
 
-#### 3. Build the [latest Anserini indices](https://github.com/castorini/anserini/blob/master/docs/experiments-cord19.md) and Milvus index
+#### 3. Build the [Anserini indices](https://github.com/castorini/anserini/blob/master/docs/experiments-cord19.md) and Milvus index
 
 ```bash
 $ sh scripts/update-index.sh
@@ -66,7 +68,7 @@ $ uvicorn app.main:app --reload --port=8000 --host=127.0.0.1
 The server wil be running at [127.0.0.1:8000](http://127.0.0.1:8000) with API documentation at [/docs](http://localhost:8000/docs)
 
 
-## UI Client
+### RUN UI Client
 
 - Install  [Node.js 12+](https://nodejs.org/en/download/) and [Yarn](https://classic.yarnpkg.com/en/docs/install/).
 
@@ -82,5 +84,5 @@ The server wil be running at [127.0.0.1:8000](http://127.0.0.1:8000) with API do
     $ yarn start
     ```
 
-The client will be running at [localhost:3000](http://localhost:3000)
+The UI client will be running at [localhost:3000](http://localhost:3000)。
 
