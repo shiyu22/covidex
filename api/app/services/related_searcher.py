@@ -16,15 +16,15 @@ class RelatedSearcher:
         self.index_to_uid: Dict[int, str] = {}
         self.uid_set: Set[str] = set()
 
-        self.host = '192.168.1.85'
-        self.port = '19570'
-        self.collection_name = 'example_collection_'
+        self.host = settings.host
+        self.port = settings.port
+        self.collection_name = settings.collection_name'example_collection_'
         self.milvus = Milvus(self.host, self.port)
 
         # Load index files
         self.load_index_to_uid()
         self.load_specter_embedding()
-        # self.load_hnsw()
+
 
     def load_index_to_uid(self):
         with open(settings.related_milvus_index_to_uid_path, 'r') as f:
@@ -57,10 +57,3 @@ class RelatedSearcher:
 
         self.embedding = res
         self.dim = dim
-
-    # def load_hnsw(self):
-    #     self.hnsw = hnswlib.Index(space='l2', dim=self.dim)
-    #     self.hnsw.load_index(settings.related_bin_path,
-    #                          max_elements=self.num_elements)
-    #     self.hnsw.set_ef(50)
-    #     print('[RelatedSearcher] Loaded HNSW')

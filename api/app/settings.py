@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     related_index_to_uid_path: str = "index/cord19-hnsw-index/cord19-hnsw.txt"
     related_milvus_index_to_uid_path: str = "index/cord19-hnsw-index-milvus/cord19-hnsw-milvus.txt"
     related_specter_csv_path: str = "index/cord19-hnsw-index/specter.csv"
+    collection_name: str = "example_collection_"
+    host: str = "127.0.0.1"
+    port: str = "19530"
 
     # Anserini searcher settings
     cord19_index_path: str = 'index/lucene-index-cord19-paragraph'

@@ -5,13 +5,14 @@ import numpy as np
 import helper
 from milvus import Milvus, IndexType, MetricType, Status
 
+from app.settings import settings
 
 class Indexer:
     def __init__(self, folder_path):
         self.folder_path = folder_path
-        self.host = '192.168.1.85'
-        self.port = '19570'
-        self.collection_name = 'example_collection_'
+        self.host = settings.host
+        self.port = settings.port
+        self.collection_name = settings.collection_name'example_collection_'
         self.milvus = Milvus(self.host, self.port)
 
 
@@ -66,6 +67,7 @@ class Indexer:
 
         print('[HNSW] Finished indexing')
 
+
     def _add_to_index(self, data, data_labels, index):
         status, ok = self.milvus.has_collection(self.collection_name)
         print("----has_collection", status, ok)
@@ -90,7 +92,7 @@ class Indexer:
         print(status, len(ids))
         return ids
         # create index of vectors, search more rapidly
-        
+
 
     def _save_index(self, data, data_labels, index_to_uid, index, ids):
         print("-----ids-----", len(ids))
