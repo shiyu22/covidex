@@ -32,10 +32,10 @@ async def get_related(request: Request, uid: str, page_number: int = 1, query_id
     parameters = {'ef': 101}
     # print(related_searcher.milvus.count_entities(related_searcher.collection_name))
     status, results = related_searcher.milvus.search(collection_name=related_searcher.collection_name, query_records=[source_vector], top_k=100, params=parameters)
-    print(status)
+    print("Milvus search.", status)
     labels = results.id_array
     distances = results.distance_array
-    print(len(labels), len(distances))
+    # print(len(labels), len(distances))
 
     start_idx = (page_number - 1)*20
     end_idx = start_idx + 20

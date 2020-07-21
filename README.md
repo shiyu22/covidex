@@ -39,7 +39,7 @@ $ docker run -d --name milvus_cpu_0.10.0 \
 milvusdb/milvus:0.10.0-cpu-d061620-5f3c00
 ```
 
-> Point out the Milvus host and port in the **api/app/settings.py** file, you can modify them for your own environment.
+> Point out the Milvus host and port in the **api/app/settings.py** file, please modify them for your own environment.
 
 #### 2. Prepare Anaconda environment
 
@@ -55,13 +55,19 @@ $ pip install -r api/requirements.txt
 #### 3. Build the [Anserini indices](https://github.com/castorini/anserini/blob/master/docs/experiments-cord19.md) and Milvus index
 
 ```bash
+# updated all indices at api/index/
 $ sh scripts/update-index.sh
+# load all data to Milvus and build HNSW index
+$ python milvus/index_milvus_hnsw.py --port=19530 --host=127.0.0.1
 ```
+
+> The **port** and **host** parameters indicate the Milvus host and port, please modify them for your own environment.
 
 #### 4. Run the server
 
 ```bash
 # make sure you are in the api folder
+$ cd api
 $ uvicorn app.main:app --reload --port=8000 --host=127.0.0.1
 ```
 

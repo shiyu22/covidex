@@ -31,13 +31,6 @@ if not settings.testing:
     app.state.related_searcher = RelatedSearcher()
     app.state.searcher = Searcher()
 
-# Disable CORS in development mode
-if settings.development:
-    app.add_middleware(CORSMiddleware,
-                       allow_origin_regex="http://localhost:*",
-                       allow_credentials=True,
-                       allow_headers=['*'])
-
 # API endpoints
 app.include_router(search.router, tags=['search'], prefix="/api")
 app.include_router(related.router, tags=['related'], prefix="/api")

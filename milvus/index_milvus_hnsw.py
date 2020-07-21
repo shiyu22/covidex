@@ -31,6 +31,18 @@ class Indexer:
         print(f'Embedding dimension: {self.dim}')
         assert len(self.metadata) == len(self.embedding), "Data size mismatch"
 
+        status, ok = self.milvus.has_collection(self.collection_name)
+        if not ok:
+            param = {
+                'collection_name': self.collection_name,
+                'dimension': self.dim,
+                'index_file_size': 1024,  # optional
+                'metric_type': MetricType.L2  # optional
+            }
+
+            status = self.milvus.create_collection(param)
+            print("create_collection:",status)
+
 
     def index_and_save(self) -> None:
         print('[HNSW] Starting to index...')
@@ -67,29 +79,15 @@ class Indexer:
 
 
     def _add_to_index(self, data, data_labels, index):
-        status, ok = self.milvus.has_collection(self.collection_name)
-        print("----has_collection", status, ok)
-        if not ok:
-            param = {
-                'collection_name': self.collection_name,
-                'dimension': self.dim,
-                'index_file_size': 1024,  # optional
-                'metric_type': MetricType.L2  # optional
-            }
-
-            status = self.milvus.create_collection(param)
-            print("create_collection:",status)
-
         data = data.tolist()
         insert_data = []
         for d in data:
             d_ = [float(i) for i in d]
             insert_data.append(d_)
-        print("--------index--------", len(insert_data),self.collection_name)
+        # print("--------index--------", len(insert_data),self.collection_name)
         status, ids = self.milvus.insert(collection_name=self.collection_name, records=insert_data)
-        print(status, len(ids))
+        # print(status, len(ids))
         return ids
-        # create index of vectors, search more rapidly
 
 
     def _save_index(self, data, data_labels, index_to_uid, index, ids):
@@ -97,7 +95,6 @@ class Indexer:
 
         index_param = {"M": 16, "efConstruction":500}
 
-        # Create HNSW index in demo_collection
         print("Creating index: {}".format(index_param))
         status = self.milvus.create_index(self.collection_name, IndexType.HNSW, index_param)
         print('[HNSW] Saving index', status)
