@@ -1,7 +1,6 @@
 dateparser==0.7.4
 fastapi[all]==0.52.0
 freezegun==0.3.15
-hnswlib==0.3.4
 httpx==0.12.1
 pygaggle==0.0.1
 python-dotenv==0.12.0
