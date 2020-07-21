@@ -5,7 +5,7 @@ import numpy as np
 import helper
 from milvus import Milvus, IndexType, MetricType, Status
 
-from app.settings import settings
+from api.app.settings import settings
 
 class Indexer:
     def __init__(self, folder_path):
