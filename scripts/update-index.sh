@@ -42,7 +42,6 @@ wget ${CORD19_HNSW_INDEX_SPECTER_URL} -O ${CORD19_HNSW_INDEX_FOLDER}/${CORD19_HN
 tar xvzf ${CORD19_HNSW_INDEX_FOLDER}/${CORD19_HNSW_INDEX_NAME}.tar.gz
 mv cord_19_embeddings*.csv ${CORD19_HNSW_INDEX_FOLDER}/specter.csv
 rm ${CORD19_HNSW_INDEX_FOLDER}/${CORD19_HNSW_INDEX_NAME}.tar.gz
-python milvus/index_hnsw.py
 
 
 echo "Successfully updated all indices at api/index/"

@@ -1,18 +1,16 @@
 import os
-
 import numpy as np
-
 import helper
+import getopt
+import sys
 from milvus import Milvus, IndexType, MetricType, Status
 
-from api.app.settings import settings
-
 class Indexer:
-    def __init__(self, folder_path):
+    def __init__(self, folder_path, host, port):
         self.folder_path = folder_path
-        self.host = settings.host
-        self.port = settings.port
-        self.collection_name = settings.collection_name
+        self.host = host
+        self.port = port
+        self.collection_name = 'covdix_collection'
         self.milvus = Milvus(self.host, self.port)
 
 
@@ -113,7 +111,26 @@ class Indexer:
 
 
 if __name__ == '__main__':
-    indexer = Indexer("./api/index/cord19-hnsw-index-milvus")
+    try:
+        opts, args = getopt.getopt(
+            sys.argv[1:],
+            ["help", "port=", "host="],
+        )
+    except getopt.GetoptError:
+        print("Usage: test.py --port <milvus_port> --host <milvus_host>")
+        sys.exit(2)
+    host="127.0.0.1"
+    port='19530'
+    for opt_name, opt_value in opts:
+        if opt_name in ("-h", "--help"):
+            print("test.py -q <nq> -k <topk> -t <table> -l -s")
+            sys.exit()
+        elif opt_name == "--host":
+            host = opt_value
+        elif opt_name == "--port":
+            port = opt_value
+
+
+    indexer = Indexer("./api/index/cord19-hnsw-index-milvus", host, port)
     indexer.load_data()
-    # indexer.initialize_hnsw_index()
     indexer.index_and_save()
