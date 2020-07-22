@@ -71,7 +71,7 @@ $ cd api
 $ uvicorn app.main:app --reload --port=8000 --host=127.0.0.1
 ```
 
-The server wil be running at [127.0.0.1:8000](http://127.0.0.1:8000) with API documentation at [/docs](http://localhost:8000/docs)
+The server wil be running at [127.0.0.1:8000](http://127.0.0.1:8000) with API documentation at [/docs](http://127.0.0.1:8000/docs)
 
 
 ### RUN UI Client
@@ -81,8 +81,12 @@ The server wil be running at [127.0.0.1:8000](http://127.0.0.1:8000) with API do
 - Install dependencies
 
     ```bash
+    # make sure you are in the client folder
+    $ cd client
     $ yarn install
     ```
+
+    > change ip for your own enviroments
 
 - Start the server
 
