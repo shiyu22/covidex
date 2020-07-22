@@ -12,7 +12,7 @@ import SearchBar from './SearchBar';
 import { tokenize } from '../../../shared/Util';
 import {
   API_BASE,
-  SEARCH_ENDPOINT,
+  SEARCH_HOME_PAGE_ENDPOINT,
   SEARCH_VERTICAL_OPTIONS,
   SearchVerticalOption,
 } from '../../../shared/Constants';
@@ -117,7 +117,7 @@ const HomePage = () => {
         setSearchResults(null);
 
         let response = await fetch(
-          `${API_BASE}${SEARCH_ENDPOINT}?query=${query.toLowerCase()}&vertical=${vertical}`,
+          `${API_BASE}${SEARCH_HOME_PAGE_ENDPOINT}?query=${query.toLowerCase()}&vertical=${vertical}`,
         );
         setLoading(false);
 

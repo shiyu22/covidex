@@ -5,6 +5,7 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import related, search
 from app.services.highlighter import Highlighter
@@ -15,19 +16,20 @@ from app.settings import settings
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Set global state for reusable services
 if not settings.testing:
     app.state.highlighter = Highlighter()
     app.state.ranker = Ranker()
     app.state.related_searcher = RelatedSearcher()
     app.state.searcher = Searcher()
-
-# Disable CORS in development mode
-if settings.development:
-    app.add_middleware(CORSMiddleware,
-                       allow_origin_regex="http://localhost:*",
-                       allow_credentials=True,
-                       allow_headers=['*'])
 
 # API endpoints
 app.include_router(search.router, tags=['search'], prefix="/api")

@@ -3,6 +3,7 @@ import { OptionTypeBase } from 'react-select';
 /* Routes */
 export const HOME_ROUTE = '/';
 export const RELATED_ROUTE = '/related';
+export const SEARCH_ROUTE = '/search';
 
 /* Breakpoints */
 export const SMALL_MOBILE_BREAKPOINT = 425;
@@ -14,8 +15,13 @@ export const CONTENT_WIDTH = 1100;
 
 /* API */
 export const API_BASE =
-  process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:8000/api' : '/api';
-export const SEARCH_ENDPOINT = '/search';
+  process.env.NODE_ENV === 'development' ? 'http://192.168.1.85:8000/api' : '/api';
+
+export const SEARCH_API_BASE =
+  process.env.NODE_ENV === 'development' ? 'http://192.168.1.160:5000/api' : '/api';
+
+export const SEARCH_PAGE_ENDPOINT = '/v1/search';
+export const SEARCH_HOME_PAGE_ENDPOINT = '/search';
 export const SEARCH_COLLAPSED_ENDPOINT = '/search/log/collapsed';
 export const SEARCH_EXPANDED_ENDPOINT = '/search/log/expanded';
 export const SEARCH_CLICKED_ENDPOINT = '/search/log/clicked';

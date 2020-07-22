@@ -1,17 +1,16 @@
 import os
-
 import numpy as np
-
 import helper
+import getopt
+import sys
 from milvus import Milvus, IndexType, MetricType, Status
 
-
 class Indexer:
-    def __init__(self, folder_path):
+    def __init__(self, folder_path, host, port):
         self.folder_path = folder_path
-        self.host = '192.168.1.85'
-        self.port = '19570'
-        self.collection_name = 'example_collection_'
+        self.host = host
+        self.port = port
+        self.collection_name = 'covdix_collection'
         self.milvus = Milvus(self.host, self.port)
 
 
@@ -32,6 +31,18 @@ class Indexer:
         print(f'Embedding dimension: {self.dim}')
         assert len(self.metadata) == len(self.embedding), "Data size mismatch"
 
+        status, ok = self.milvus.has_collection(self.collection_name)
+        if not ok:
+            param = {
+                'collection_name': self.collection_name,
+                'dimension': self.dim,
+                'index_file_size': 1024,  # optional
+                'metric_type': MetricType.L2  # optional
+            }
+
+            status = self.milvus.create_collection(param)
+            print("Milvus create_collection:",status)
+
 
     def index_and_save(self) -> None:
         print('[HNSW] Starting to index...')
@@ -41,7 +52,7 @@ class Indexer:
         ids = []
 
         for index, uid in enumerate(self.embedding):
-            if index % 1000 == 0:
+            if index % 10000 == 0:
                 print(
                     f'[HNSW] Indexed {index}/{self.num_elements}')
 
@@ -66,38 +77,24 @@ class Indexer:
 
         print('[HNSW] Finished indexing')
 
+
     def _add_to_index(self, data, data_labels, index):
-        status, ok = self.milvus.has_collection(self.collection_name)
-        print("----has_collection", status, ok)
-        if not ok:
-            param = {
-                'collection_name': self.collection_name,
-                'dimension': self.dim,
-                'index_file_size': 1024,  # optional
-                'metric_type': MetricType.L2  # optional
-            }
-
-            status = self.milvus.create_collection(param)
-            print("create_collection:",status)
-
         data = data.tolist()
         insert_data = []
         for d in data:
             d_ = [float(i) for i in d]
             insert_data.append(d_)
-        print("--------index--------", len(insert_data),self.collection_name)
+        # print("--------index--------", len(insert_data),self.collection_name)
         status, ids = self.milvus.insert(collection_name=self.collection_name, records=insert_data)
-        print(status, len(ids))
+        # print(status, len(ids))
         return ids
-        # create index of vectors, search more rapidly
-        
+
 
     def _save_index(self, data, data_labels, index_to_uid, index, ids):
         print("-----ids-----", len(ids))
 
         index_param = {"M": 16, "efConstruction":500}
 
-        # Create HNSW index in demo_collection
         print("Creating index: {}".format(index_param))
         status = self.milvus.create_index(self.collection_name, IndexType.HNSW, index_param)
         print('[HNSW] Saving index', status)
@@ -111,7 +108,27 @@ class Indexer:
 
 
 if __name__ == '__main__':
-    indexer = Indexer("./api/index/cord19-hnsw-index-milvus")
+    try:
+        opts, args = getopt.getopt(
+            sys.argv[1:],
+            "p:h:",
+            ["help", "port=", "host="],
+        )
+    except getopt.GetoptError:
+        print("Usage: test.py --port <milvus_port> --host <milvus_host>")
+        sys.exit(2)
+    host="127.0.0.1"
+    port='19530'
+    for opt_name, opt_value in opts:
+        if opt_name in ("-h", "--help"):
+            print("test.py -q <nq> -k <topk> -t <table> -l -s")
+            sys.exit()
+        elif opt_name == "--host":
+            host = opt_value
+        elif opt_name == "--port":
+            port = opt_value
+
+
+    indexer = Indexer("./api/index/cord19-hnsw-index-milvus", host, port)
     indexer.load_data()
-    # indexer.initialize_hnsw_index()
     indexer.index_and_save()

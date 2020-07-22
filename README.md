@@ -1,118 +1,98 @@
 # COVID-19 Open Research Dataset Search
 
-[![Build Status](https://api.travis-ci.com/castorini/covidex.svg?branch=master)](https://travis-ci.org/castorini/covidex)
-[![LICENSE](https://img.shields.io/badge/license-Apache-blue.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
-
-This repository contains the API server, neural models, and UI client for [Covidex](https://covidex.ai), a neural search engine for the [COVID-19 Open Research Dataset (CORD-19)](https://pages.semanticscholar.org/coronavirus-research).
+This system contains the API server, neural models, and UI client, a neural search engine for the [COVID-19 Open Research Dataset (CORD-19)](https://pages.semanticscholar.org/coronavirus-research) and is refer to [covidex](https://github.com/castorini/covidex).
 
 
 ## Local Deployment
 
-#### API Server
+### Requirements
 
-Install CUDA 10.1
-+ For Ubuntu, follow [these instructions](https://developer.nvidia.com/cuda-10.1-download-archive-update2)
-+ For Debian run `sudo apt-get install nvidia-cuda-toolkit`
+- Install [CUDA 10.1](https://developer.nvidia.com/cuda-10.1-download-archive-update2)
 
-Install [Anaconda](https://docs.anaconda.com/anaconda/install/linux/) (currently version 2020.02)
-```
-wget https://repo.anaconda.com/archive/Anaconda3-2020.02-Linux-x86_64.sh
-bash Anaconda3-2020.02-Linux-x86_64.sh
-```
++ Install [Anaconda](https://docs.anaconda.com/anaconda/install/linux/)
 
-Install Java 11
-```
-sudo apt-get install openjdk-11-jre openjdk-11-jdk
-```
+  ```bash
+  $ wget https://repo.anaconda.com/archive/Anaconda3-2020.02-Linux-x86_64.sh
+  $ bash Anaconda3-2020.02-Linux-x86_64.sh
+  ```
 
-Build the [latest Anserini indices](https://github.com/castorini/anserini/blob/master/docs/experiments-cord19.md)
-```
-sh scripts/update-anserini-index.sh
-```
+- Install Java 11
 
-Build the latest HNSW index for related article search
-```
-sh scripts/update-hnsw-index.sh
-```
+    ```bash
+    $ sudo apt-get install openjdk-11-jre openjdk-11-jdk
+    ```
 
-Set up environment variables by copying over the defaults and modifying as needed
-```
-cp api/.env.sample api/.env
-```
+### Run Server
 
-Create an Anaconda environment for Python 3.7
-```
-conda create -n covidex python=3.7
+#### 1. Start Docker container
+
+The server system uses Milvus 0.10.0. Refer to the [Install Milvus](https://github.com/milvus-io/docs/blob/v0.10.0/site/en/guides/get_started/install_milvus/install_milvus.md) for how to start Milvus server.
+
+```bash
+$ docker run -d --name milvus_cpu_0.10.0 \
+-p 19530:19530 \
+-p 19121:19121 \
+-v /home/$USER/milvus/db:/var/lib/milvus/db \
+-v /home/$USER/milvus/conf:/var/lib/milvus/conf \
+-v /home/$USER/milvus/logs:/var/lib/milvus/logs \
+-v /home/$USER/milvus/wal:/var/lib/milvus/wal \
+milvusdb/milvus:0.10.0-cpu-d061620-5f3c00
 ```
 
-Activate the Anaconda environment
-```
-conda activate covidex
+> Point out the Milvus host and port in the **api/app/settings.py** file, please modify them for your own environment.
+
+#### 2. Prepare Anaconda environment
+
+```bash
+# Create an Anaconda environment named covdiex for Python 3.7
+$ conda create -n covidex python=3.7
+# Activate the covdiex environment
+$ conda activate covidex
+# Install Python dependencies
+$ pip install -r api/requirements.txt
 ```
 
-Install Python dependencies
-```
-pip install -r api/requirements.txt
+#### 3. Build the [Anserini indices](https://github.com/castorini/anserini/blob/master/docs/experiments-cord19.md) and Milvus index
+
+```bash
+# updated all indices at api/index/
+$ sh scripts/update-index.sh
+# load all data to Milvus and build HNSW index
+$ python milvus/index_milvus_hnsw.py --port=19530 --host=127.0.0.1
 ```
 
-Run the server (make sure you are in the `api/` folder)
-```
-uvicorn app.main:app --reload --port=8000
-```
+> The **port** and **host** parameters indicate the Milvus host and port, please modify them for your own environment.
 
-The server wil be running at [localhost:8000](http://localhost:8000) with API documentation at [/docs](http://localhost:8000/docs)
+#### 4. Run the server
 
-
-#### UI Client
-
-Install  [Node.js 12+](https://nodejs.org/en/download/) and [Yarn](https://classic.yarnpkg.com/en/docs/install/).
-
-Install dependencies
-```
-yarn install
+```bash
+# make sure you are in the api folder
+$ cd api
+$ uvicorn app.main:app --reload --port=8000 --host=127.0.0.1
 ```
 
-Start the server
-```
-yarn start
-```
-
-The client will be running at [localhost:3000](http://localhost:3000)
+The server wil be running at [127.0.0.1:8000](http://127.0.0.1:8000) with API documentation at [/docs](http://127.0.0.1:8000/docs)
 
 
-## Production Deployment
+### RUN UI Client
 
-Redirect port 80 to specified port since only root can bind to port 80 (the below command uses port 8000):
-```
-sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8000
-```
+- Install  [Node.js 12+](https://nodejs.org/en/download/) and [Yarn](https://classic.yarnpkg.com/en/docs/install/).
 
-Build the [latest Anserini indices](https://github.com/castorini/anserini/blob/master/docs/experiments-cord19.md)
-```
-sh scripts/update-anserini-index.sh [DATE]
-```
+- Install dependencies
 
-Build the latest HNSW index for related article search
-```
-sh scripts/update-hnsw-index.sh
-```
+    ```bash
+    # make sure you are in the client folder
+    $ cd client
+    $ yarn install
+    ```
 
-Start the server (deploys to port 8000 by default):
-```
-sh scripts/deploy-prod.sh
-```
+    > change ip for your own enviroments
 
-*Optional:* set the environment variable `$PORT`:
-```
-PORT=8000 sh scripts/deploy-prod.sh
-```
+- Start the server
 
-Log files are available under `api/logs`, where new files are created daily based on UTC time. All filenames have the date appended except for the current one, which will be named `search.log` or `related.log`.
+    ```bash
+    $ yarn start
+    ```
 
+The UI client will be running at [localhost:3000](http://localhost:3000)。
 
-## Testing
-
-To run all API tests
-```
-TESTING=true pytest api
-```
