@@ -86,7 +86,7 @@ The server wil be running at [127.0.0.1:8000](http://127.0.0.1:8000) with API do
     $ yarn install
     ```
 
-    > change ip for your own enviroments
+    > If you changed the port of the server, please modify the parames at src/shared/Constants.ts at line 17 for your own enviroments.
 
 - Start the server
 

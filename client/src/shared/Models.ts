@@ -34,3 +34,8 @@ export interface SelectedSearchFilters {
   journals: Set<string>;
   sources: Set<string>;
 }
+
+export interface SearchResultView {
+  title: string;
+  content: string;
+}

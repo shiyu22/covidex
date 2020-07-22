@@ -2,10 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router';
 
-import GithubImg from '../../img/github.png';
-
 import { TABLET_BREAKPOINT, HOME_ROUTE } from '../../shared/Constants';
-import { PageContent, Heading1, Link } from '../../shared/Styles';
+import { PageContent, Heading1 } from '../../shared/Styles';
 
 const Navbar = ({ history }: RouteComponentProps) => {
   return (
@@ -15,23 +13,6 @@ const Navbar = ({ history }: RouteComponentProps) => {
           <NavbarLogo tabIndex={0} onClick={() => history.push(HOME_ROUTE)}>
             Neural Covidex
           </NavbarLogo>
-          <NavbarLinks>
-            <Link
-              href="https://github.com/castorini/covidex"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <GithubLogo src={GithubImg} alt="Github logo" />
-            </Link>
-
-            <Link
-              href="https://docs.google.com/forms/d/e/1FAIpQLSe4_5imtXsvPHGRPFfRaXPaohEpJZAYz8OmDaDe0a4pLsTUdg/viewform?usp=sf_link"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Feedback
-            </Link>
-          </NavbarLinks>
         </Row>
       </PageContent>
     </NavbarWrapper>
@@ -66,32 +47,4 @@ const NavbarLogo = styled.a`
   cursor: pointer;
   color: ${({ theme }) => theme.white};
   max-width: fit-content;
-`;
-
-const NavbarLinks = styled.div`
-  display: flex;
-  align-items: center;
-
-  a {
-    display: flex;
-    align-items: center;
-    color: ${({ theme }) => theme.white};
-
-    &:hover {
-      color: ${({ theme }) => theme.white};
-      filter: brightness(85%);
-    }
-  }
-`;
-
-const GithubLogo = styled.img`
-  display: flex;
-  height: 24px;
-  width: 24px;
-  cursor: pointer;
-  margin-right: 24px;
-
-  &:hover {
-    filter: brightness(85%);
-  }
 `;
