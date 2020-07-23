@@ -2,6 +2,8 @@
 
 This system contains the API server, neural models, and UI client, a neural search engine for the [COVID-19 Open Research Dataset (CORD-19)](https://pages.semanticscholar.org/coronavirus-research) and is refer to [covidex](https://github.com/castorini/covidex).
 
+At the COVID-19 Dataset Search system, Milvus is used to get the related articles. Let's start to have fun with the local deployment.
+
 
 ## Local Deployment
 
@@ -68,10 +70,10 @@ $ python milvus/index_milvus_hnsw.py --port=19530 --host=127.0.0.1
 ```bash
 # make sure you are in the api folder
 $ cd api
-$ uvicorn app.main:app --reload --port=8000 --host=127.0.0.1
+$ uvicorn app.main:app --reload --port=8000
 ```
 
-The server wil be running at [127.0.0.1:8000](http://127.0.0.1:8000) with API documentation at [/docs](http://127.0.0.1:8000/docs)
+The server wil be running at [localhost:8000](http://localhost:8000) with API documentation at [/docs](http://localhost:8000/docs)
 
 
 ### RUN UI Client
@@ -94,5 +96,11 @@ The server wil be running at [127.0.0.1:8000](http://127.0.0.1:8000) with API do
     $ yarn start
     ```
 
-The UI client will be running at [localhost:3000](http://localhost:3000)。
+The UI client will be running at [localhost:3000](http://localhost:3000), enter it in the browser to open the interface.
+
+- Search somthing about COVID-19
+
+  ![](./pic/search.png)
+
+- Get the related articles
 
